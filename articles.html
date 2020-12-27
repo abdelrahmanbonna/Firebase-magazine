@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+    <title>Starter Template · Bootstrap</title>
+
+    <!--Template based on URL below-->
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/starter-template/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Place your stylesheet here-->
+    <link href="/css/stylesheet.css" rel="stylesheet" type="text/css">
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#">Firebase</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                    <a class="nav-link" href="/Dept.html">Departments </a>
+
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Articles<span class="sr-only">(current)</span></a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+
+    <main role="main" class="container" onload="AddDepts()">
+
+        <div class="mt-5 pt-5">
+            <div class="form-group">
+                <label for="ArticleID">Article ID</label>
+                <input type="text" name="ArticleID" id="ArticleID" class="form-control" placeholder="Department ID" readonly>
+                <br>
+                <label for="art-name">Article Name</label>
+                <input type="text" class="form-control" name="art-name" id="art-name" placeholder="Article Name">
+                <br>
+                <label for="art-content">Article Content</label>
+                <input type="text" class="form-control" name="art-content" id="art-content" placeholder="Article Content">
+                <br>
+                <label for="art-dept">Article Department</label>
+                <select class="custom-select" name="art-dept" id="art-dept">
+                        <option selected>Select one</option>
+                </select>
+                <br>
+                <button type="button" id="btnSave" class="btn btn-primary my-1" onclick="writeData()">Save</button>
+            </div>
+            <hr>
+            <table id="data" class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Content</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Options</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </main>
+    <!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyBJiyhICtfvNr22NnqrLpamIcBb1iW7AIo",
+            authDomain: "test-5ed83.firebaseapp.com",
+            databaseURL: "https://test-5ed83.firebaseio.com",
+            projectId: "test-5ed83",
+            storageBucket: "test-5ed83.appspot.com",
+            messagingSenderId: "775864589530",
+            appId: "1:775864589530:web:5bc72d0f55c289566699e3"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        var database = firebase.database();
+
+        //populating the selector
+        var depts = firebase.database().ref('depts');
+        depts.on('value', (snapshot) => {
+            const data = snapshot.val();
+            AddDepts(data);
+        });
+
+        function AddDepts(data) {
+            $("#art-dept").html("");
+            $("#art-dept").append("<option selected>Select one</option>");
+            for (var item in data) {
+                var dditem = `<option value="${data[item].name}">${data[item].name}</option>`;
+                $("#art-dept").append(dditem);
+            }
+        }
+        // write data into firebase
+        function writeData() {
+            var id = $("#ArticleID").val();
+            var nameVal = $("#art-name").val();
+            var contentVal = $("#art-content").val();
+            var deptVal = $("#art-dept").val();
+            if (id == "") {
+                firebase.database().ref().child('articles').push({
+                    name: nameVal,
+                    content: contentVal,
+                    department: deptVal
+                });
+            } else {
+                var updates = {};
+                updates['/articles/' + id] = {
+                    name: nameVal,
+                    content: contentVal,
+                    department: deptVal
+                };
+                firebase.database().ref().update(updates);
+            }
+            Reset();
+        }
+        //populating the table
+        var arts = firebase.database().ref('articles');
+        arts.on('value', (snapshot) => {
+            const data = snapshot.val();
+            updateDataTable(data);
+        });
+
+        function updateDataTable(data) {
+            $("tbody").empty();
+            console.log(data)
+            for (var item in data) {
+                var row = `<tr>
+                <td>${data[item].name}</td>
+                <td>${data[item].content}</td>
+                <td>${data[item].department}</td>
+                <td>
+                    <input type="button" class="btn btn-info" value="update" onclick="Update('${item}','${data[item].name}','${data[item].content}')">
+                    <input type="button" class="btn btn-danger" value="delete" onclick="Delete('${item}')">
+                </td>
+            </tr>`;
+                $("tbody").append(row);
+            }
+        }
+
+        function Update(id, name, content, dept) {
+            $("#ArticleID").val(id);
+            $("#art-name").val(name);
+            $("#art-content").val(content);
+            $("#art-dept").val(dept);
+        }
+
+        function Reset() {
+            $("#ArticleID").val("");
+            $("#art-name").val("");
+            $("#art-content").val("");
+            $("#art-dept").val("");
+        }
+
+        function Delete(id) {
+            var updates = {};
+            updates['/articles/' + id] = null;
+            firebase.database().ref().update(updates);
+        }
+    </script>
+</body>
+
+</html>

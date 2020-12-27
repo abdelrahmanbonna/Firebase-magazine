@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+    <title>Departments</title>
+
+    <!--Template based on URL below-->
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.3/examples/starter-template/">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Place your stylesheet here-->
+
+</head>
+
+<body onload="Show()">
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="#">Firebase</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Departments <span class="sr-only">(current)</span></a>
+
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/articles.html">Articles</a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+
+    <main role="main" class="container">
+
+        <div class=" mt-5 pt-5">
+            <div class="form-group">
+                <label for="dept-name">Department Name</label>
+                <input type="text" class="form-control" name="dept-name" id="dept-name" aria-describedby="help1" placeholder="Department Name">
+                <small class="form-text text-muted">Enter a name here</small>
+                <button type="button" id="btnSave" class="btn btn-primary my-1" onclick="Save()">Save</button>
+            </div>
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Department Name</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+    <!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script>
+        function Save() {
+            var nameValue = $("#dept-name").val();
+            var data = {
+                "name": nameValue,
+            };
+
+            $.ajax({
+                accept: "application/json",
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "https://test-5ed83.firebaseio.com/depts.json",
+                data: JSON.stringify(data),
+                success: function(data) {
+                    Show();
+                    $("#dept-name").val("");
+                },
+                error: function() {
+                    console.log("Error in saving data")
+                }
+            });
+        }
+
+        function Show() {
+            $.ajax({
+                accept: "application/json",
+                type: 'GET',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                url: "https://test-5ed83.firebaseio.com/depts.json",
+                success: function(data) {
+                    $("tbody").empty();
+                    for (var item in data) {
+                        var row = `<tr>
+                            <td>${data[item].name}</td>
+                            <td>
+                                <input type="button" class="btn btn-danger" value="delete" onclick="Delete('${item}')">
+                            </td>
+                        </tr>`;
+                        $("tbody").append(row);
+                    }
+                },
+                error: function() {
+                    console.log("Error in showing data")
+                }
+            });
+        }
+
+        function Delete(id) {
+            var sure = confirm("Are you sure you want to delete this Department? ");
+            if (sure == true) {
+                $.ajax({
+                    accept: "application/json",
+                    type: 'DELETE',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    url: "https://test-5ed83.firebaseio.com/depts/" + id + "/.json",
+                    success: function(data) {
+                        Show();
+                    },
+                    error: function() {
+                        console.log("Error in deleting department")
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
